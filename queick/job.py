@@ -7,9 +7,9 @@ import pdb
 from .constants import RETRY_TYPE
 
 class Job:
-    def __init__(self, func_name, arg, sq, priority=1, retry_interval=10, max_retry_interval=600, retry_type=RETRY_TYPE.CONSTANT, max_workers=10):
+    def __init__(self, func_name, args, sq, priority=1, retry_interval=10, max_retry_interval=600, retry_type=RETRY_TYPE.CONSTANT, max_workers=10):
         self.func_name = func_name
-        self.arg = arg
+        self.args = args
         self.max_workers = max_workers
         self.sq = sq
         self.priority = priority
@@ -27,18 +27,18 @@ class Job:
         return self.__create_func_with_error_handling(f)
 
     def perform(self):
-        self.__async_execute(self.func, self.arg)
+        self.__async_execute(self.func, self.args)
 
-    def __async_execute(self, func, arg):
-        future = self.executor.submit(self.func, arg)
+    def __async_execute(self, func, args):
+        future = self.executor.submit(self.func, args)
 
     def terminate(self):
         self.executor.shutdown()
 
     def __create_func_with_error_handling(self, func):
-        def f(arg):
+        def f(args):
             try:
-                func(arg)
+                func(*args)
             except:
                 traceback.print_exc()
                 self.retry()
@@ -73,7 +73,7 @@ class Job:
     # 実行するモジュールを変更したらプロセスも再起動しなくてはならない。。。
     # 実行するモジュールはそれ単体で動けなければならない。
     def __import_job_module(self, name):
-        pdb.set_trace()
         module_name, attribute = name.rsplit('.', 1)
-        module = importlib.import_module(module_name)
+        m = importlib.import_module(module_name)
+        module = importlib.reload(m)
         return getattr(module, attribute)

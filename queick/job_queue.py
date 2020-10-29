@@ -4,11 +4,11 @@ import pickle
 from .constants import RETRY_TYPE
 
 class JobQueue:
-    def enqueue(self, func, arg, retry_interval=10, retry_type=RETRY_TYPE.CONSTANT):
+    def enqueue(self, func, args=None, retry_interval=10, retry_type=RETRY_TYPE.CONSTANT):
         func_name = func.__module__ + "." + func.__name__
         payload = {
                 "func_name": func_name,
-                "arg": arg,
+                "args": args,
                 "retry_interval": retry_interval,
                 "retry_type": retry_type
                 }

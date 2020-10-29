@@ -1,4 +1,4 @@
 import time
-def function(arg):
+def function(arg1, arg2):
     time.sleep(1)
-    print(arg)
+    print(arg1, "+", arg2, "=", arg1 + arg2)

@@ -35,7 +35,7 @@ class Worker:
             while qm.is_empty() != True:
                 data = qm.dequeue()
 
-                job = qm.create_job(data['func_name'], data['arg'], sq, retry_interval=data['retry_interval'], retry_type=data['retry_type'])
+                job = qm.create_job(data['func_name'], data['args'], sq, retry_interval=data['retry_interval'], retry_type=data['retry_type'])
                 job.perform()
 
                 print(data)
