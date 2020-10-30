@@ -8,7 +8,7 @@ class ScheduledQueue:
 
     def enqueue(self, job):
         try:
-            self.queue.enterabs(job.start_at, job.priority, job.func, argument=(job.arg,))
+            self.queue.enterabs(job.start_at, job.priority, job.func, argument=(job.args,))
             self.queue.run()
         except Exception as e:
             traceback.print_exc()
