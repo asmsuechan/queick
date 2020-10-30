@@ -35,7 +35,7 @@ class Worker:
             while qm.is_empty() != True:
                 data = qm.dequeue()
 
-                job = qm.create_job(data['func_name'], data['args'], sq, retry_interval=data['retry_interval'], retry_type=data['retry_type'])
+                job = qm.create_job(data['func_name'], data['args'], sq, retry=data['retry'], retry_interval=data['retry_interval'], retry_type=data['retry_type'])
                 job.perform()
 
                 print(data)
@@ -55,6 +55,9 @@ class Worker:
             self.watch_queue(qm, sq)
 
         except KeyboardInterrupt:
-            pass
+            p.terminate()
+            for job in sq.queue.queue:
+                sq.queue.cancel(job)
+            print("Stopping... Press Ctrl+C to exit immediately")
         finally:
             p.join()

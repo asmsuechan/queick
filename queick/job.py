@@ -7,12 +7,13 @@ import pdb
 from .constants import RETRY_TYPE
 
 class Job:
-    def __init__(self, func_name, args, sq, priority=1, retry_interval=10, max_retry_interval=600, retry_type=RETRY_TYPE.CONSTANT, max_workers=10):
+    def __init__(self, func_name, args, sq, priority=1, retry=True, retry_interval=10, max_retry_interval=600, retry_type=RETRY_TYPE.CONSTANT, max_workers=10):
         self.func_name = func_name
         self.args = args
         self.max_workers = max_workers
         self.sq = sq
         self.priority = priority
+        self.retry = retry
         self.retry_interval = retry_interval
         self.max_retry_interval = max_retry_interval
         self.retry_type = retry_type
@@ -39,19 +40,19 @@ class Job:
         def f(args):
             try:
                 func(*args)
-            except:
-                traceback.print_exc()
-                self.retry()
+            except Exception as e:
+                # TODO: Fix this ugly error message
+                error_msg = "Traceback (most recent call last):\n" + "".join(traceback.extract_tb(e.__traceback__).format()) + type(e).__name__ + ":" + str(e)
+                print(error_msg)
+                if self.retry: self.__retry()
                 self.terminate()
         return f
 
-    def retry(self):
-        try:
-            self.__increase_retry_count()
-            self.start_at = self.start_at + self.__calc_interval()
-            self.sq.enqueue(self)
-        except:
-            traceback.print_exc()
+    def __retry(self):
+        self.__increase_retry_count()
+        self.start_at = self.start_at + self.__calc_interval()
+        self.sq.enqueue(self)
+        self.sq.run()
 
     def __increase_retry_count(self):
         self.retry_count += 1
@@ -70,8 +71,6 @@ class Job:
 
         return interval
 
-    # 実行するモジュールを変更したらプロセスも再起動しなくてはならない。。。
-    # 実行するモジュールはそれ単体で動けなければならない。
     def __import_job_module(self, name):
         module_name, attribute = name.rsplit('.', 1)
         m = importlib.import_module(module_name)
