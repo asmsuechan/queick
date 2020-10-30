@@ -22,10 +22,8 @@ class Job:
         self.executor = ThreadPoolExecutor(max_workers=self.max_workers)
         self.__minimum_retry_interval = 1
 
-    @property
-    def func(self):
         f = self.__import_job_module(self.func_name)
-        return self.__create_func_with_error_handling(f)
+        self.func = self.__create_func_with_error_handling(f)
 
     def perform(self):
         self.__async_execute(self.func, self.args)
