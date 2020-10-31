@@ -3,7 +3,7 @@ from logging import CRITICAL, DEBUG, INFO, ERROR, WARNING
 from logging import addLevelName, getLevelName, getLogger
 
 def init_logger():
-    formatter = Formatter('[%(levelname)s] %(asctime)s - %(name)s - %(message)s')
+    formatter = Formatter('[%(levelname)s] %(asctime)s - %(message)s')
 
     logger = getLogger(__name__)
     addLevelName(CRITICAL, "\033[1;41m%s\033[1;0m" % getLevelName(CRITICAL))

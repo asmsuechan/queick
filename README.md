@@ -1,5 +1,7 @@
 # Queick
-The simple inmemory job-queue manager.
+A simple inmemory job-queue manager.
+
+![capture](/capture.gif)
 
 ## Feature
 * Written in Python
@@ -26,9 +28,11 @@ def function(arg):
 # test.py
 from queick import JobQueue
 from jobfunc import function
+from time import time
 
 q = JobQueue()
-q.enqueue(function, "hello")
+q.enqueue(function, args=("hello",))
+q.enqueue_at(time() + 5, function, args=("world",)) # Run after 5 seconds
 ```
 
 ```
