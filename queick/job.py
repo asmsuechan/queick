@@ -7,17 +7,17 @@ import pdb
 from .constants import RETRY_TYPE
 
 class Job:
-    def __init__(self, func_name, args, sq, priority=1, retry=True, retry_interval=10, max_retry_interval=600, retry_type=RETRY_TYPE.CONSTANT, max_workers=10):
+    def __init__(self, func_name, args, scheduler, start_at=time.time(), priority=1, retry=True, retry_interval=10, max_retry_interval=600, retry_type=RETRY_TYPE.CONSTANT, max_workers=10):
         self.func_name = func_name
         self.args = args
         self.max_workers = max_workers
-        self.sq = sq
+        self.scheduler = scheduler
         self.priority = priority
         self.retry = retry
         self.retry_interval = retry_interval
         self.max_retry_interval = max_retry_interval
         self.retry_type = retry_type
-        self.start_at = time.time()
+        self.start_at = start_at
         self.retry_count = 0
         self.executor = ThreadPoolExecutor(max_workers=self.max_workers)
         self.__minimum_retry_interval = 1
@@ -49,8 +49,8 @@ class Job:
     def __retry(self):
         self.__increase_retry_count()
         self.start_at = self.start_at + self.__calc_interval()
-        self.sq.enqueue(self)
-        self.sq.run()
+        self.scheduler.put(self)
+        self.scheduler.run()
 
     def __increase_retry_count(self):
         self.retry_count += 1
