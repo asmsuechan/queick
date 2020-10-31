@@ -6,6 +6,7 @@ import importlib
 
 from .queue_manager import QueueManager
 from .scheduler import Scheduler
+from .logger import logger
 
 event = Event()
 
@@ -21,12 +22,17 @@ class Worker:
             data_bytes = conn.recv(1024)
             if not data_bytes: break
 
-            data = pickle.loads(data_bytes)
-            qm.enqueue(data)
-            event.set()
-
-            print('data : {}, addr: {}'.format(data, addr))
-            conn.sendall(b'Received: ')
+            try:
+                data = pickle.loads(data_bytes)
+                qm.enqueue(data)
+                event.set()
+                logger.info('Job received -> data: {}, addr: {}'.format(data, addr))
+                response = pickle.dumps({ "success": True, "error": None})
+                conn.sendall(response)
+            except Exception as e:
+                logger.error(str(e))
+                response = pickle.dumps({ "success": False, "error": str(e)})
+                conn.sendall(response)
         conn.close()
 
     def watch_queue(self, qm, scheduler):
@@ -42,8 +48,6 @@ class Worker:
                     scheduler.run()
                 else:
                     job.perform()
-
-                print(data)
 
             event.clear()
             if qm.is_empty():
@@ -63,6 +67,6 @@ class Worker:
             p.terminate()
             for job in scheduler.queue.queue:
                 scheduler.queue.cancel(job)
-            print("Stopping... Press Ctrl+C to exit immediately")
+            logger.info("Stopping... Press Ctrl+C to exit immediately")
         finally:
             p.join()

@@ -29,7 +29,7 @@ class JobQueue:
                 "max_retry_interval": max_retry_interval,
                 "max_workers": max_workers
                 }
-        self.__send_to_job_listener(payload)
+        return self.__send_to_job_listener(payload)
 
     def __send_to_job_listener(self, payload):
         s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -38,4 +38,4 @@ class JobQueue:
         s.sendall(pickle.dumps(payload))
 
         msg = s.recv(1024)
-        print(msg.decode("utf-8"))
+        return pickle.loads(msg)

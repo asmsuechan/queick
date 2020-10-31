@@ -5,6 +5,7 @@ import time
 import pdb
 
 from .constants import RETRY_TYPE
+from .logger import logger
 
 class Job:
     def __init__(self, func_name, args, scheduler, start_at=time.time(), priority=1, retry=True, retry_interval=10, max_retry_interval=600, retry_type=RETRY_TYPE.CONSTANT, max_workers=10):
@@ -41,7 +42,7 @@ class Job:
             except Exception as e:
                 # TODO: Fix this ugly error message
                 error_msg = "Traceback (most recent call last):\n" + "".join(traceback.extract_tb(e.__traceback__).format()) + type(e).__name__ + ":" + str(e)
-                print(error_msg)
+                logger.error(error_msg)
                 if self.retry: self.__retry()
                 self.terminate()
         return f
