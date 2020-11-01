@@ -1,5 +1,6 @@
 import importlib
 from concurrent.futures import ThreadPoolExecutor
+import os
 import traceback
 import time
 import pdb
@@ -8,7 +9,7 @@ from .constants import RETRY_TYPE
 from .logger import logger
 
 class Job:
-    def __init__(self, func_name, args, scheduler, start_at=time.time(), priority=1, retry=True, retry_interval=10, max_retry_interval=600, retry_type=RETRY_TYPE.CONSTANT, max_workers=10):
+    def __init__(self, func_name, args, scheduler, start_at=time.time(), priority=1, retry=True, retry_interval=10, max_retry_interval=600, retry_type=RETRY_TYPE.CONSTANT, max_workers=os.cpu_count()):
         self.func_name = func_name
         self.args = args
         self.max_workers = max_workers

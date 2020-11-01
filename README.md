@@ -9,6 +9,8 @@ A simple inmemory job-queue manager.
 * Working for low-spec machines
 
 ## Installation
+Python version >= 3.6 is required.
+
 ```
 pip install queick
 ```
