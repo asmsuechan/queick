@@ -21,13 +21,13 @@ class QueueManager:
     def create_job(self, *args, **kwargs):
         return Job(*args, **kwargs)
 
-    def watch(self, event, scheduler):
+    def watch(self, event, scheduler, nw):
         event.wait()
         while True:
             while self.is_empty() != True:
                 data = self.dequeue()
 
-                job = self.create_job(data['func_name'], data['args'], scheduler, retry=data['retry'], retry_interval=data['retry_interval'], retry_type=data['retry_type'])
+                job = self.create_job(data['func_name'], data['args'], scheduler, nw, retry=data['retry'], retry_interval=data['retry_interval'], retry_type=data['retry_type'], retry_on_network_available=data['retry_on_network_available'])
                 if 'start_at' in data:
                     job.start_at = data['start_at']
                     scheduler.put(job)

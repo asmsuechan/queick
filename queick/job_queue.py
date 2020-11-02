@@ -5,18 +5,18 @@ from .constants import RETRY_TYPE
 
 class JobQueue:
     def enqueue(self, func, args=None, priority=1, retry=False, retry_interval=10,
-                max_retry_interval=600, retry_type=RETRY_TYPE.CONSTANT, max_workers=10):
+                max_retry_interval=600, retry_on_network_available=False, retry_type=RETRY_TYPE.CONSTANT, max_workers=10):
         return self.__create_request(func, args, priority, retry, retry_interval,
-                max_retry_interval, retry_type, max_workers)
+                max_retry_interval, retry_on_network_available, retry_type, max_workers)
 
     def enqueue_at(self, start_at, func, args=None, priority=1,
-                retry=False, retry_interval=10, max_retry_interval=600,
+                retry=False, retry_interval=10, max_retry_interval=600, retry_on_network_available=False,
                 retry_type=RETRY_TYPE.CONSTANT, max_workers=10):
         return self.__create_request(func, args, priority, retry, retry_interval,
-                max_retry_interval, retry_type, max_workers, start_at=start_at)
+                max_retry_interval, retry_on_network_available, retry_type, max_workers, start_at=start_at)
 
     def __create_request(self, func, args, priority, retry, retry_interval,
-                max_retry_interval, retry_type, max_workers, start_at=None):
+                max_retry_interval, retry_on_network_available, retry_type, max_workers, start_at=None):
         func_name = func.__module__ + "." + func.__name__
         payload = {
                 "func_name": func_name,
@@ -25,6 +25,7 @@ class JobQueue:
                 "retry_interval": retry_interval,
                 "retry_type": retry_type,
                 "max_retry_interval": max_retry_interval,
+                "retry_on_network_available": retry_on_network_available,
                 "max_workers": max_workers
                 }
         if start_at: payload.update({ "start_at": start_at })
