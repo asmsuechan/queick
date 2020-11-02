@@ -9,7 +9,9 @@ from .constants import RETRY_TYPE
 from .logger import logger
 
 class Job:
-    def __init__(self, func_name, args, scheduler, start_at=time.time(), priority=1, retry=True, retry_interval=10, max_retry_interval=600, retry_type=RETRY_TYPE.CONSTANT, max_workers=os.cpu_count()):
+    def __init__(self, func_name, args, scheduler, start_at=time.time(), priority=1,
+                retry=False, retry_interval=10, max_retry_interval=600,
+                retry_type=RETRY_TYPE.CONSTANT, max_workers=os.cpu_count()):
         self.func_name = func_name
         self.args = args
         self.max_workers = max_workers
@@ -42,7 +44,9 @@ class Job:
                 func(*args)
             except Exception as e:
                 # TODO: Fix this ugly error message
-                error_msg = "Traceback (most recent call last):\n" + "".join(traceback.extract_tb(e.__traceback__).format()) + type(e).__name__ + ":" + str(e)
+                error_msg = "Traceback (most recent call last):\n" + \
+                        "".join(traceback.extract_tb(e.__traceback__).format()) + \
+                        type(e).__name__ + ":" + str(e)
                 logger.error(error_msg)
                 if self.retry: self.__retry()
                 self.terminate()

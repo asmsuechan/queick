@@ -1,5 +1,5 @@
 # Queick
-A simple inmemory job-queue manager.
+A simple inmemory job-queue manager for Python.
 
 ![capture](/capture.gif)
 
