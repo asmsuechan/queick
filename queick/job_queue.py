@@ -6,16 +6,16 @@ from .constants import RETRY_TYPE
 class JobQueue:
     def enqueue(self, func, args=None, priority=1, retry=False, retry_interval=10,
                 max_retry_interval=600, retry_on_network_available=False, retry_type=RETRY_TYPE.CONSTANT, max_workers=10):
-        return self.__create_request(func, args, priority, retry, retry_interval,
+        return self._create_request(func, args, priority, retry, retry_interval,
                 max_retry_interval, retry_on_network_available, retry_type, max_workers)
 
     def enqueue_at(self, start_at, func, args=None, priority=1,
                 retry=False, retry_interval=10, max_retry_interval=600, retry_on_network_available=False,
                 retry_type=RETRY_TYPE.CONSTANT, max_workers=10):
-        return self.__create_request(func, args, priority, retry, retry_interval,
+        return self._create_request(func, args, priority, retry, retry_interval,
                 max_retry_interval, retry_on_network_available, retry_type, max_workers, start_at=start_at)
 
-    def __create_request(self, func, args, priority, retry, retry_interval,
+    def _create_request(self, func, args, priority, retry, retry_interval,
                 max_retry_interval, retry_on_network_available, retry_type, max_workers, start_at=None):
         func_name = func.__module__ + "." + func.__name__
         payload = {
@@ -29,9 +29,9 @@ class JobQueue:
                 "max_workers": max_workers
                 }
         if start_at: payload.update({ "start_at": start_at })
-        return self.__send_to_job_listener(payload)
+        return self._send_to_job_listener(payload)
 
-    def __send_to_job_listener(self, payload):
+    def _send_to_job_listener(self, payload):
         s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         s.connect(('127.0.0.1', 9999))
         s.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)

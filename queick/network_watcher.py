@@ -31,7 +31,7 @@ class NetworkWatcher:
     def dequeue(self):
         return self.failed_queue.get()
 
-    def __is_connected(self):
+    def _is_connected(self):
         try:
             host = socket.gethostbyname(self.hostname)
             s = socket.create_connection((host, self.port), 2)
@@ -53,7 +53,7 @@ class NetworkWatcher:
 
     def watch(self):
         while True:
-            if self.__is_connected():
+            if self._is_connected():
                 if self.state == STATE.DISCONNECTED:
                     while self.is_empty() != True:
                         # Dequeue all from failed queue and perform them
