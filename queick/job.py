@@ -3,7 +3,6 @@ from concurrent.futures import ThreadPoolExecutor
 import os
 import traceback
 import time
-import pdb
 
 from .constants import RETRY_TYPE
 from .logger import logger
@@ -33,10 +32,10 @@ class Job:
         self.network_watcher = network_watcher
 
     def perform(self):
-        self._async_execute(self.func, self.args)
+        return self._async_execute(self.func, self.args)
 
     def _async_execute(self, func, args):
-        future = self.executor.submit(self.func, args)
+        return self.executor.submit(self.func, args)
 
     def terminate(self):
         self.executor.shutdown()
@@ -44,13 +43,14 @@ class Job:
     def _create_func_with_error_handling(self, func):
         def f(args):
             try:
-                func(*args)
+                return func(*args)
             except Exception as e:
                 # TODO: Fix this ugly error message
                 error_msg = "Traceback (most recent call last):\n" + \
                         "".join(traceback.extract_tb(e.__traceback__).format()) + \
                         type(e).__name__ + ":" + str(e)
                 logger.error(error_msg)
+
                 if not self.retry_on_network_available and self.retry:
                     self._schedule_retry()
                 else:
@@ -59,6 +59,7 @@ class Job:
                     self.network_watcher.enqueue(self._job_input_obj)
 
                 self.terminate()
+                return None
         return f
 
     @property
