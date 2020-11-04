@@ -12,10 +12,11 @@ def main():
     parser.add_argument('--ping-host')
     parser.add_argument('--ping-port')
     parser.add_argument('-debug', action='store_true')
+    parser.add_argument('--log-filepath')
     args = parser.parse_args()
 
     loglevel = DEBUG if args.debug else INFO
-    setup_logger(loglevel=loglevel)
+    setup_logger(loglevel=loglevel, filepath=args.log_filepath)
     logger.info('Welcome to Queick!')
     sys.path.append('.')
     w = Worker()
