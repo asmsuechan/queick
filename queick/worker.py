@@ -4,10 +4,11 @@ import pickle
 import time
 import importlib
 
+from .constants import NW_STATE
 from .queue_manager import QueueManager
 from .job_receiver import JobReceiver
 from .scheduler import Scheduler
-from .network_watcher import NetworkWatcher, STATE
+from .network_watcher import NetworkWatcher
 from .logger import logger
 
 class Worker:
@@ -33,7 +34,7 @@ class Worker:
 
         except KeyboardInterrupt:
             p.terminate()
-            if nw.state != STATE.INITIATED: nw.terminate()
+            if nw.state != NW_STATE.INITIATED: nw.terminate()
             for job in scheduler.queue.queue:
                 scheduler.queue.cancel(job)
             logger.info("Stopping... Press Ctrl+C to exit immediately")

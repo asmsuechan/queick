@@ -3,22 +3,15 @@ import time
 
 from multiprocessing import Process, Queue
 
-from .constants import enum
+from .constants import NW_STATE
 from .job import Job
-
-STATE = enum(
-    'State',
-    CONNECTED='connected',
-    DISCONNECTED='disconnected',
-    INITIATED='initiated',
-)
 
 class NetworkWatcher:
     def __init__(self, hostname, port, queue_class=None):
         self.hostname = hostname
         self.port = port
         self.check_interval = 1
-        self.state = STATE.INITIATED
+        self.state = NW_STATE.INITIATED
 
         self.p = Process(target=self.watch)
 
@@ -43,7 +36,7 @@ class NetworkWatcher:
 
     def start(self):
         self.p.start()
-        self.state = STATE.CONNECTED
+        self.state = NW_STATE.CONNECTED
 
     def terminate(self):
         self.p.terminate()
@@ -54,13 +47,13 @@ class NetworkWatcher:
     def watch(self):
         while True:
             if self._is_connected():
-                if self.state == STATE.DISCONNECTED:
+                if self.state == NW_STATE.DISCONNECTED:
                     while self.is_empty() != True:
                         # Dequeue all from failed queue and perform them
                         data = self.dequeue()
                         job = Job(data['func_name'], data['args'], None, self, retry=data['retry'], retry_interval=data['retry_interval'], retry_type=data['retry_type'], retry_on_network_available=data['retry_on_network_available'])
                         job.perform()
-                self.state = STATE.CONNECTED
+                self.state = NW_STATE.CONNECTED
             else:
-                self.state = STATE.DISCONNECTED
+                self.state = NW_STATE.DISCONNECTED
             time.sleep(self.check_interval)

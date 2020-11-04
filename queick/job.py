@@ -4,7 +4,7 @@ import os
 import traceback
 import time
 
-from .constants import RETRY_TYPE
+from .constants import RETRY_TYPE, NW_STATE
 from .logger import logger
 
 class Job:
@@ -56,6 +56,8 @@ class Job:
                 else:
                     # The priority of retry_on_network_available is higher than retry.
                     # Normal retry will be ignored when retry_on_network_available == True.
+                    if self.network_watcher.state == NW_STATE.INITIATED:
+                        logger.error('retry_on_network_available is specified, but --ping-host is not set to Queick worker.')
                     self.network_watcher.enqueue(self._job_input_obj)
 
                 self.terminate()

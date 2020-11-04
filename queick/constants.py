@@ -9,5 +9,12 @@ RETRY_TYPE = enum(
     COUNT_INCREASING='count_increasing',
 )
 
+NW_STATE = enum(
+    'State',
+    CONNECTED='connected',
+    DISCONNECTED='disconnected',
+    INITIATED='initiated',
+)
+
 TCP_SERVER_HOST = '127.0.0.1'
 TCP_SERVER_PORT = 9999
