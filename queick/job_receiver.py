@@ -18,10 +18,10 @@ class JobReceiver:
             try:
                 data = pickle.loads(data_bytes)
                 qm.enqueue(data)
-                event.set()
                 logger.info('Job received -> data: {}, addr: {}'.format(data, addr))
                 response = pickle.dumps({ "success": True, "error": None})
                 conn.sendall(response)
+                event.set()
             except Exception as e:
                 logger.error(str(e))
                 response = pickle.dumps({ "success": False, "error": str(e)})

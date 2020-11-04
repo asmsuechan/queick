@@ -12,11 +12,8 @@
 .tox
 .pytest_cache/
 .vagrant
-Vagrantfile
 .idea/
 .coverage*
 /.cache
 
-Gemfile
-Gemfile.lock
-_site/
+testfile
