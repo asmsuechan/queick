@@ -56,14 +56,15 @@ class Job:
                     # Normal retry will be ignored when retry_on_network_available == True.
                     if self.network_watcher.state == NW_STATE.INITIATED:
                         logger.error('func_name: %s, args: %s, retry_on_network_available is specified, but --ping-host is not set to Queick worker.', self.func_name, self.args)
-                    self.network_watcher.enqueue(self._job_input_obj)
+                    else:
+                        self.network_watcher.enqueue(self.job_input_obj)
 
                 self.terminate()
                 return None
         return f
 
     @property
-    def _job_input_obj(self):
+    def job_input_obj(self):
         return {
                 "func_name": self.func_name,
                 "args": self.args,

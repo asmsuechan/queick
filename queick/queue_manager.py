@@ -13,6 +13,7 @@ class QueueManager:
         self.queue = qc()
 
     def enqueue(self, value):
+        logger.debug('[QueueManager] Job is queued: %s', value)
         self.queue.put(value)
 
     def dequeue(self):
@@ -29,6 +30,7 @@ class QueueManager:
         while True:
             while self.is_empty() != True:
                 data = self.dequeue()
+                logger.debug('[QueueManager] Job is dequeued: %s', data)
 
                 job = self.create_job(data['func_name'], data['args'], scheduler, nw, retry=data['retry'], retry_interval=data['retry_interval'], retry_type=data['retry_type'], retry_on_network_available=data['retry_on_network_available'])
                 if 'start_at' in data:
