@@ -22,10 +22,10 @@ class Worker:
             p.start()
 
             nw = NetworkWatcher("", 0, queue_class=Queue)
-            # Start NetworkWatcher only when --host argument is passed
-            if args.host:
-                port = args.port if args.port != None else 80
-                nw.hostname = args.host
+            # Start NetworkWatcher only when --ping-host argument is passed
+            if args.ping_host:
+                port = args.ping_port if args.ping_port != None else 80
+                nw.hostname = args.ping_host
                 nw.port = port
                 nw.start()
 

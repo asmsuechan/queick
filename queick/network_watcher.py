@@ -17,7 +17,7 @@ class NetworkWatcher:
     def __init__(self, hostname, port, queue_class=None):
         self.hostname = hostname
         self.port = port
-        self.check_interval = 5
+        self.check_interval = 1
         self.state = STATE.INITIATED
 
         self.p = Process(target=self.watch)

@@ -5,8 +5,8 @@ import argparse
 
 def main():
     parser = argparse.ArgumentParser(description='Queick')
-    parser.add_argument('--host')
-    parser.add_argument('--port')
+    parser.add_argument('--ping-host')
+    parser.add_argument('--ping-port')
     args = parser.parse_args()
 
     logger.info('Welcome to Queick!')
