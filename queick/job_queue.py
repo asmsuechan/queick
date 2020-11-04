@@ -1,7 +1,7 @@
 import socket
 import pickle
 
-from .constants import RETRY_TYPE
+from .constants import RETRY_TYPE, TCP_SERVER_HOST, TCP_SERVER_PORT
 
 class JobQueue:
     def enqueue(self, func, args=None, priority=1, retry=False, retry_interval=10,
@@ -33,9 +33,16 @@ class JobQueue:
 
     def _send_to_job_listener(self, payload):
         s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        s.connect(('127.0.0.1', 9999))
-        s.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
-        s.sendall(pickle.dumps(payload))
+        try:
+            s.connect((TCP_SERVER_HOST, TCP_SERVER_PORT))
+            s.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+            s.sendall(pickle.dumps(payload))
 
-        msg = s.recv(1024)
-        return pickle.loads(msg)
+            msg = s.recv(1024)
+            return pickle.loads(msg)
+        except ConnectionRefusedError:
+            self._print_client_error('Queick worker is not found. Make sure you launched queick.')
+            return None
+
+    def _print_client_error(self, msg):
+        print('\033[91m' + msg + '\033[0m')

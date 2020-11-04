@@ -2,12 +2,13 @@ import socket
 import pickle
 
 from .logger import logger
+from .constants import TCP_SERVER_HOST, TCP_SERVER_PORT
 
 class JobReceiver:
     # Start tcp server for listening new job arrival messages
     def listen(self, event, qm):
         s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        s.bind(('127.0.0.1', 9999))
+        s.bind((TCP_SERVER_HOST, TCP_SERVER_PORT))
         s.listen(1)
 
         while True:

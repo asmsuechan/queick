@@ -8,3 +8,6 @@ RETRY_TYPE = enum(
     LINEAR_INCREASING='linear_increasing',
     COUNT_INCREASING='count_increasing',
 )
+
+TCP_SERVER_HOST = '127.0.0.1'
+TCP_SERVER_PORT = 9999
