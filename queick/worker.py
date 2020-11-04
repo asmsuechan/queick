@@ -3,13 +3,15 @@ import socket
 import pickle
 import time
 import importlib
+from logging import getLogger
 
 from .constants import NW_STATE
 from .queue_manager import QueueManager
 from .job_receiver import JobReceiver
 from .scheduler import Scheduler
 from .network_watcher import NetworkWatcher
-from .logger import logger
+
+logger = getLogger(__name__)
 
 class Worker:
     def work(self, args):

@@ -1,10 +1,12 @@
 import socket
 import time
-
 from multiprocessing import Process, Queue
+from logging import INFO, getLogger
 
 from .constants import NW_STATE
 from .job import Job
+
+logger = getLogger(__name__)
 
 class NetworkWatcher:
     def __init__(self, hostname, port, queue_class=None):

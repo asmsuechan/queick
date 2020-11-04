@@ -3,9 +3,11 @@ from concurrent.futures import ThreadPoolExecutor
 import os
 import traceback
 import time
+from logging import getLogger
 
 from .constants import RETRY_TYPE, NW_STATE
-from .logger import logger
+
+logger = getLogger(__name__)
 
 class Job:
     def __init__(self, func_name, args, scheduler, network_watcher, start_at=time.time(), priority=1,
@@ -45,11 +47,7 @@ class Job:
             try:
                 return func(*args)
             except Exception as e:
-                # TODO: Fix this ugly error message
-                error_msg = "Traceback (most recent call last):\n" + \
-                        "".join(traceback.extract_tb(e.__traceback__).format()) + \
-                        type(e).__name__ + ":" + str(e)
-                logger.error(error_msg)
+                logger.error("Error during executing a job function: %s", self.func_name, exc_info=True)
 
                 if not self.retry_on_network_available and self.retry:
                     self._schedule_retry()
@@ -57,7 +55,7 @@ class Job:
                     # The priority of retry_on_network_available is higher than retry.
                     # Normal retry will be ignored when retry_on_network_available == True.
                     if self.network_watcher.state == NW_STATE.INITIATED:
-                        logger.error('retry_on_network_available is specified, but --ping-host is not set to Queick worker.')
+                        logger.error('func_name: %s, args: %s, retry_on_network_available is specified, but --ping-host is not set to Queick worker.', self.func_name, self.args)
                     self.network_watcher.enqueue(self._job_input_obj)
 
                 self.terminate()

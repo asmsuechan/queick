@@ -1,8 +1,11 @@
 import socket
 import pickle
 from multiprocessing import Queue
+from logging import getLogger
 
 from .job import Job
+
+logger = getLogger(__name__)
 
 class QueueManager:
     def __init__(self, queue_class=None):

@@ -1,5 +1,8 @@
-import sched, time
-import pdb
+import sched
+import time
+from logging import getLogger
+
+logger = getLogger(__name__)
 
 class Scheduler:
     def __init__(self):
