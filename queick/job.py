@@ -1,6 +1,4 @@
 import importlib
-from concurrent.futures import ThreadPoolExecutor
-import os
 import traceback
 import time
 from logging import getLogger
@@ -10,12 +8,11 @@ from .constants import RETRY_TYPE, NW_STATE
 logger = getLogger(__name__)
 
 class Job:
-    def __init__(self, func_name, args, scheduler, network_watcher, start_at=time.time(), priority=1,
+    def __init__(self, func_name, args, executor, scheduler, network_watcher, start_at=time.time(), priority=1,
                 retry=False, retry_interval=10, max_retry_interval=600, retry_on_network_available=False,
-                retry_type=RETRY_TYPE.CONSTANT, max_workers=os.cpu_count()):
+                retry_type=RETRY_TYPE.CONSTANT):
         self.func_name = func_name
         self.args = args
-        self.max_workers = max_workers
         self.scheduler = scheduler
         self.priority = priority
         self.retry = retry
@@ -25,7 +22,7 @@ class Job:
         self.start_at = start_at
         self.retry_on_network_available = retry_on_network_available
         self.retry_count = 0
-        self.executor = ThreadPoolExecutor(max_workers=self.max_workers)
+        self.executor = executor
         self._minimum_retry_interval = 1
 
         f = self._import_job_module(self.func_name)
@@ -40,12 +37,14 @@ class Job:
         return self.executor.submit(self.func, args)
 
     def terminate(self):
-        self.executor.shutdown()
+        self.executor.shutdown(wait=False)
 
     def _create_func_with_error_handling(self, func):
         def f(args):
             try:
-                return func(*args)
+                res = func(*args)
+                self.terminate() # Terminate all idle threads
+                return res
             except Exception as e:
                 logger.error("Error during executing a job function: %s", self.func_name, exc_info=True)
 
@@ -72,8 +71,7 @@ class Job:
                 "retry_interval": self.retry_interval,
                 "retry_type": self.retry_type,
                 "max_retry_interval": self.max_retry_interval,
-                "retry_on_network_available": self.retry_on_network_available,
-                "max_workers": self.max_workers
+                "retry_on_network_available": self.retry_on_network_available
                 }
 
     def _schedule_retry(self):

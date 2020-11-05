@@ -1,9 +1,16 @@
 import time
+import urllib.request
 def function(arg1, arg2):
-    time.sleep(1)
-    raise
     print(arg1, "+", arg2, "=", arg1 + arg2)
 
 def function2(arg):
-    time.sleep(1)
-    print(arg)
+    start_time = time.time()
+
+    # with urllib.request.urlopen('https://moriokalab.com') as f:
+    #     pass
+
+    end_time = time.time()
+
+    print("Time:", end_time - start_time)
+    # time.sleep(1)
+    # print(arg)
