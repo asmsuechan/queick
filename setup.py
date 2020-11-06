@@ -1,10 +1,19 @@
 from setuptools import setup, find_packages
 
+try:
+    with open('README.md') as f:
+        readme = f.read()
+except IOError:
+    readme = ''
+
 setup(
     name="queick",
     version="0.0.1",
+    url="https://github.com/asmsuechan/queick",
     description="A lightweight job-queue management system",
     author="asmsuechan",
+    author_email="suenagaryoutaabc@gmail.com",
+    long_description=readme,
     packages=find_packages(),
     entry_points={
         "console_scripts": [
