@@ -2,6 +2,7 @@ import importlib
 import traceback
 import time
 from logging import getLogger
+from random import random
 
 from .constants import RETRY_TYPE, NW_STATE
 
@@ -9,8 +10,8 @@ logger = getLogger(__name__)
 
 class Job:
     def __init__(self, func_name, args, executor, scheduler, network_watcher, start_at=time.time(), priority=1,
-                retry=False, retry_interval=10, max_retry_interval=600, retry_on_network_available=False,
-                retry_type=RETRY_TYPE.CONSTANT):
+                retry=False, retry_interval=10, max_retry_interval=3600, retry_on_network_available=False,
+                retry_type=RETRY_TYPE.EXPONENTIAL):
         self.func_name = func_name
         self.args = args
         self.scheduler = scheduler
@@ -50,7 +51,8 @@ class Job:
 
                 if not self.retry_on_network_available and self.retry:
                     self._schedule_retry()
-                else:
+
+                if self.retry_on_network_available:
                     # The priority of retry_on_network_available is higher than retry.
                     # Normal retry will be ignored when retry_on_network_available == True.
                     if self.network_watcher.state == NW_STATE.INITIATED:
@@ -76,21 +78,26 @@ class Job:
 
     def _schedule_retry(self):
         self._increase_retry_count()
-        self.start_at = self.start_at + self._calc_interval()
+        self.start_at = self.start_at + self._calc_retry_interval()
         self.scheduler.put(self)
         self.scheduler.run()
 
     def _increase_retry_count(self):
         self.retry_count += 1
 
-    def _calc_interval(self):
+    def _calc_retry_interval(self):
         interval = self._minimum_retry_interval
+
         if self.retry_type == RETRY_TYPE.CONSTANT:
             interval = self.retry_interval
         elif self.retry_type == RETRY_TYPE.COUNT_INCREASING:
             interval = self.retry_count
         elif self.retry_type == RETRY_TYPE.LINEAR_INCREASING:
             interval = self.retry_interval * self.retry_count
+        elif self.retry_type == RETRY_TYPE.EXPONENTIAL:
+            sleep_seconds = (2 ** (self.retry_count - 1)) * (0.5 * (1 + random()))
+            sleep_seconds = max([1, sleep_seconds])
+            interval = sleep_seconds
 
         if interval > self.max_retry_interval:
             interval = self.max_retry_interval

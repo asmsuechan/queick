@@ -71,7 +71,7 @@ There are some options for queick worker.
 |name|default|description|
 |:-|-:|-:|
 |-debug|False|if set, detailed logs will be shown|
-|--ping-host <HOST>|""|hostname for NetworkWatcher to check if the machine has the internet connection|
+|--ping-host <HOST>|None|hostname for NetworkWatcher to check if the machine has the internet connection|
 |--ping-port <PORT>|80|port number for NetworkWatcher|
 |--log-filepath <filepath>|None|logfile to save all the worker log|
 

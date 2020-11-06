@@ -6,13 +6,13 @@ from .exceptions import WorkerNotFoundError
 
 class JobQueue:
     def enqueue(self, func, args=None, priority=1, retry=False, retry_interval=10,
-                max_retry_interval=600, retry_on_network_available=False, retry_type=RETRY_TYPE.CONSTANT, max_workers=10):
+                max_retry_interval=600, retry_on_network_available=False, retry_type=RETRY_TYPE.EXPONENTIAL, max_workers=10):
         return self._create_request(func, args, priority, retry, retry_interval,
                 max_retry_interval, retry_on_network_available, retry_type, max_workers)
 
     def enqueue_at(self, start_at, func, args=None, priority=1,
                 retry=False, retry_interval=10, max_retry_interval=600, retry_on_network_available=False,
-                retry_type=RETRY_TYPE.CONSTANT, max_workers=10):
+                retry_type=RETRY_TYPE.EXPONENTIAL, max_workers=10):
         return self._create_request(func, args, priority, retry, retry_interval,
                 max_retry_interval, retry_on_network_available, retry_type, max_workers, start_at=start_at)
 

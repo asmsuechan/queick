@@ -7,6 +7,7 @@ RETRY_TYPE = enum(
     CONSTANT='constant',
     LINEAR_INCREASING='linear_increasing',
     COUNT_INCREASING='count_increasing',
+    EXPONENTIAL='exponential',
 )
 
 NW_STATE = enum(
