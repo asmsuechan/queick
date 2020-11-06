@@ -8,7 +8,7 @@ except IOError:
 
 setup(
     name="queick",
-    version="0.0.1",
+    version="1.0.0",
     url="https://github.com/asmsuechan/queick",
     description="A lightweight job-queue management system",
     author="asmsuechan",
