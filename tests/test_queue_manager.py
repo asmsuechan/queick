@@ -34,5 +34,5 @@ class TestQueueManager(unittest.TestCase):
 
     def test_create_job(self):
         qm = QueueManager()
-        job = qm.create_job('tests.testfunc.func', ('test',), None, None)
+        job = qm.create_job('tests.testfunc.func', ('test',), None, None, None)
         self.assertEqual(type(job), Job)
