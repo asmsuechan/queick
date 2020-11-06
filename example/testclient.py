@@ -5,7 +5,7 @@ import time
 q = JobQueue()
 # print(q.enqueue(function2, args=(1,)))
 # q.enqueue(function, args=(1, 2,), retry_type=RETRY_TYPE.LINEAR_INCREASING)
-for i in range(0, 1000000):
+for i in range(0, 1):
     q.enqueue(function, args=(1, 2,), retry_on_network_available=True)
 # print(q.enqueue(function, args=(1, 2,), retry_on_network_available=True))
 # print(q.enqueue(function, args=(1, 2,), retry_on_network_available=True))

@@ -1,11 +1,6 @@
-import sys
 import argparse
-from logging import DEBUG, INFO, getLogger
 
 from .worker import Worker
-from .logger import setup_logger
-
-logger = getLogger(__name__)
 
 def main():
     parser = argparse.ArgumentParser(description='Queick')
@@ -15,9 +10,5 @@ def main():
     parser.add_argument('-lf', '--log-filepath', help='logfile to save all the worker log')
     args = parser.parse_args()
 
-    loglevel = DEBUG if args.debug else INFO
-    setup_logger(loglevel=loglevel, filepath=args.log_filepath)
-    logger.info('Welcome to Queick!')
-    sys.path.append('.')
     w = Worker()
-    w.work(args)
+    w.work(ping_host=args.ping_host, ping_port=args.ping_port, debug=args.debug)

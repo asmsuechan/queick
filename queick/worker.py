@@ -3,18 +3,25 @@ import socket
 import pickle
 import time
 import importlib
-from logging import getLogger
+import sys
+from logging import DEBUG, INFO, getLogger
 
 from .constants import NW_STATE
 from .queue_manager import QueueManager
 from .job_receiver import JobReceiver
 from .scheduler import Scheduler
 from .network_watcher import NetworkWatcher
+from .logger import setup_logger
 
 logger = getLogger(__name__)
 
 class Worker:
-    def work(self, args):
+    def work(self, ping_host=None, ping_port=80, log_filepath=None, debug=False):
+        loglevel = DEBUG if debug else INFO
+        setup_logger(loglevel=loglevel, filepath=log_filepath)
+        sys.path.append('.')
+        logger.info('Welcome to Queick!')
+
         try:
             event = Event()
             qm = QueueManager(queue_class=Queue)
@@ -26,10 +33,9 @@ class Worker:
 
             nw = NetworkWatcher("", 0, queue_class=Queue)
             # Start NetworkWatcher only when --ping-host argument is passed
-            if args.ping_host:
-                port = args.ping_port if args.ping_port != None else 80
-                nw.hostname = args.ping_host
-                nw.port = port
+            if ping_host:
+                nw.hostname = ping_host
+                nw.port = ping_port
                 nw.start()
 
             qm.watch(event, scheduler, nw)

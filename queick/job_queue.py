@@ -29,7 +29,10 @@ class JobQueue:
                 "max_workers": max_workers
                 }
         if start_at: payload.update({ "start_at": start_at })
-        return self._send_to_job_listener(payload)
+        result, error = self._send_to_job_listener(payload)
+        if error != None:
+            raise error
+        return result
 
     def _send_to_job_listener(self, payload):
         s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -39,10 +42,11 @@ class JobQueue:
             s.sendall(pickle.dumps(payload))
 
             msg = s.recv(1024)
-            return pickle.loads(msg)
+            return pickle.loads(msg), None
         except ConnectionRefusedError:
             self._print_client_error('Queick worker is not found. Make sure you launched queick.')
-            return None
+            # raise error
+            return None, Exception
 
     def _print_client_error(self, msg):
         print('\033[91m' + msg + '\033[0m')
