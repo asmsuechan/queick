@@ -9,10 +9,10 @@ logger = getLogger(__name__)
 
 def main():
     parser = argparse.ArgumentParser(description='Queick')
-    parser.add_argument('--ping-host')
-    parser.add_argument('--ping-port')
-    parser.add_argument('-debug', action='store_true')
-    parser.add_argument('--log-filepath')
+    parser.add_argument('-ph', '--ping-host', help='hostname for NetworkWatcher to check if the machine has the internet connection')
+    parser.add_argument('-pp', '--ping-port', help='port number for NetworkWatcher')
+    parser.add_argument('-debug', help='if set, detailed logs will be shown', action='store_true')
+    parser.add_argument('-lf', '--log-filepath', help='logfile to save all the worker log')
     args = parser.parse_args()
 
     loglevel = DEBUG if args.debug else INFO
