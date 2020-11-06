@@ -94,3 +94,18 @@ Integration test:
 $ docker build -t queick-test .
 $ docker run --rm -it queick-test:latest
 ```
+
+## Development
+Build queick for development.
+
+```
+$ python setup.py develop
+```
+
+## Deployment
+Deployed at https://pypi.org/project/queick/.
+
+```
+$ python setup.py sdist
+$ twine upload dist/*
+```
