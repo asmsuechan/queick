@@ -2,6 +2,7 @@ import socket
 import pickle
 
 from .constants import RETRY_TYPE, TCP_SERVER_HOST, TCP_SERVER_PORT
+from .exceptions import WorkerNotFoundError
 
 class JobQueue:
     def enqueue(self, func, args=None, priority=1, retry=False, retry_interval=10,
@@ -45,8 +46,7 @@ class JobQueue:
             return pickle.loads(msg), None
         except ConnectionRefusedError:
             self._print_client_error('Queick worker is not found. Make sure you launched queick.')
-            # raise error
-            return None, Exception
+            return None, WorkerNotFoundError()
 
     def _print_client_error(self, msg):
         print('\033[91m' + msg + '\033[0m')
