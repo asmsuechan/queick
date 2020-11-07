@@ -7,12 +7,15 @@ from random import random
 from .constants import RETRY_TYPE, NW_STATE
 from .exceptions import NoSuchJobError
 
+from concurrent.futures import ThreadPoolExecutor, Future
+from types import MethodType
+
 logger = getLogger(__name__)
 
 
 class Job:
-    def __init__(self, func_name, args, executor, scheduler, network_watcher, start_at=time.time(), priority=1,
-                 retry=False, retry_interval=10, max_retry_interval=3600, retry_on_network_available=False,
+    def __init__(self, func_name: str, args: tuple, executor: ThreadPoolExecutor, scheduler, network_watcher, start_at: float = time.time(), priority: int = 1,
+                 retry: bool = False, retry_interval: int = 10, max_retry_interval: int = 3600, retry_on_network_available: bool = False,
                  retry_type=RETRY_TYPE.EXPONENTIAL):
         self.func_name = func_name
         self.args = args
@@ -31,7 +34,7 @@ class Job:
         self.network_watcher = network_watcher
 
     @property
-    def func(self):
+    def func(self) -> MethodType:
         f, err = self._import_job_module(self.func_name)
         if type(err) == ModuleNotFoundError:
             raise NoSuchJobError(
@@ -40,16 +43,16 @@ class Job:
             raise err
         return self._create_func_with_error_handling(f)
 
-    def perform(self):
+    def perform(self) -> Future:
         return self._async_execute(self.func, self.args)
 
-    def _async_execute(self, func, args):
+    def _async_execute(self, func, args) -> Future:
         return self.executor.submit(self.func, args)
 
-    def terminate(self):
+    def terminate(self) -> None:
         self.executor.shutdown(wait=False)
 
-    def _create_func_with_error_handling(self, func):
+    def _create_func_with_error_handling(self, func: MethodType):
         def f(args):
             try:
                 res = func(*args)
@@ -76,7 +79,7 @@ class Job:
         return f
 
     @property
-    def job_input_obj(self):
+    def job_input_obj(self) -> dict:
         return {
             "func_name": self.func_name,
             "args": self.args,
@@ -87,16 +90,16 @@ class Job:
             "retry_on_network_available": self.retry_on_network_available
         }
 
-    def _schedule_retry(self):
+    def _schedule_retry(self) -> None:
         self._increase_retry_count()
         self.start_at = self.start_at + self._calc_retry_interval()
         self.scheduler.put(self)
         self.scheduler.run()
 
-    def _increase_retry_count(self):
+    def _increase_retry_count(self) -> None:
         self.retry_count += 1
 
-    def _calc_retry_interval(self):
+    def _calc_retry_interval(self) -> int:
         interval = self._minimum_retry_interval
 
         if self.retry_type == RETRY_TYPE.CONSTANT:

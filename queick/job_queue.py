@@ -4,21 +4,24 @@ import pickle
 from .constants import RETRY_TYPE, TCP_SERVER_HOST, TCP_SERVER_PORT
 from .exceptions import WorkerNotFoundError
 
+from types import MethodType
+from typing import Union, Tuple
+
 
 class JobQueue:
-    def enqueue(self, func, args=None, priority=1, retry=False, retry_interval=10,
-                max_retry_interval=600, retry_on_network_available=False, retry_type=RETRY_TYPE.EXPONENTIAL, max_workers=10):
+    def enqueue(self, func: MethodType, args: Union[tuple, None] = None, priority: int = 1, retry: bool = False, retry_interval: int = 10,
+                max_retry_interval: int = 600, retry_on_network_available: bool = False, retry_type: RETRY_TYPE = RETRY_TYPE.EXPONENTIAL, max_workers: int = 10) -> dict:
         return self._create_request(func, args, priority, retry, retry_interval,
                                     max_retry_interval, retry_on_network_available, retry_type, max_workers)
 
-    def enqueue_at(self, start_at, func, args=None, priority=1,
-                   retry=False, retry_interval=10, max_retry_interval=600, retry_on_network_available=False,
-                   retry_type=RETRY_TYPE.EXPONENTIAL, max_workers=10):
+    def enqueue_at(self, start_at: float, func: MethodType, args: Union[tuple, None] = None, priority: int = 1,
+                   retry: bool = False, retry_interval: int = 10, max_retry_interval: int = 600, retry_on_network_available: bool = False,
+                   retry_type: RETRY_TYPE = RETRY_TYPE.EXPONENTIAL, max_workers: int = 10) -> dict:
         return self._create_request(func, args, priority, retry, retry_interval,
                                     max_retry_interval, retry_on_network_available, retry_type, max_workers, start_at=start_at)
 
-    def _create_request(self, func, args, priority, retry, retry_interval,
-                        max_retry_interval, retry_on_network_available, retry_type, max_workers, start_at=None):
+    def _create_request(self, func: MethodType, args, priority: int, retry: bool, retry_interval: int,
+                        max_retry_interval: int, retry_on_network_available: bool, retry_type: RETRY_TYPE, max_workers: int, start_at: Union[float, None] = None):
         func_name = func.__module__ + "." + func.__name__
         payload = {
             "func_name": func_name,
@@ -33,11 +36,11 @@ class JobQueue:
         if start_at:
             payload.update({"start_at": start_at})
         result, error = self._send_to_job_listener(payload)
-        if error != None:
+        if error:
             raise error
         return result
 
-    def _send_to_job_listener(self, payload):
+    def _send_to_job_listener(self, payload: dict) -> Tuple[Union[dict, None], Union[None, WorkerNotFoundError]]:
         s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         try:
             s.connect((TCP_SERVER_HOST, TCP_SERVER_PORT))
@@ -51,5 +54,5 @@ class JobQueue:
                 'Queick worker is not found. Make sure you launched queick.')
             return None, WorkerNotFoundError()
 
-    def _print_client_error(self, msg):
+    def _print_client_error(self, msg: str) -> None:
         print('\033[91m' + msg + '\033[0m')

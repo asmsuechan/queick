@@ -13,11 +13,13 @@ from .scheduler import Scheduler
 from .network_watcher import NetworkWatcher
 from .logger import setup_logger
 
+from typing import Union
+
 logger = getLogger(__name__)
 
 
 class Worker:
-    def work(self, ping_host=None, ping_port=80, log_filepath=None, debug=False):
+    def work(self, ping_host: Union[str, None] = None, ping_port: Union[int, None] = 80, log_filepath: Union[str, None] = None, debug: bool = False) -> None:
         loglevel = DEBUG if debug else INFO
         setup_logger(loglevel=loglevel, filepath=log_filepath)
         sys.path.append('.')
