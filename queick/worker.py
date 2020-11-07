@@ -46,5 +46,4 @@ class Worker:
             for job in scheduler.queue.queue:
                 scheduler.queue.cancel(job)
             logger.info("Stopping... Press Ctrl+C to exit immediately")
-        finally:
             p.join()

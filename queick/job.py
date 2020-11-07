@@ -5,6 +5,7 @@ from logging import getLogger
 from random import random
 
 from .constants import RETRY_TYPE, NW_STATE
+from .exceptions import NoSuchJobError
 
 logger = getLogger(__name__)
 
@@ -26,10 +27,16 @@ class Job:
         self.executor = executor
         self._minimum_retry_interval = 1
 
-        f = self._import_job_module(self.func_name)
-        self.func = self._create_func_with_error_handling(f)
-
         self.network_watcher = network_watcher
+
+    @property
+    def func(self):
+        f, err = self._import_job_module(self.func_name)
+        if type(err) == ModuleNotFoundError:
+            raise NoSuchJobError('Queick worker could not find the job. Please check your worker\'s launching directory.')
+        if err:
+            raise err
+        return self._create_func_with_error_handling(f)
 
     def perform(self):
         return self._async_execute(self.func, self.args)
@@ -105,7 +112,10 @@ class Job:
         return interval
 
     def _import_job_module(self, name):
-        module_name, attribute = name.rsplit('.', 1)
-        m = importlib.import_module(module_name)
-        module = importlib.reload(m)
-        return getattr(module, attribute)
+        try:
+            module_name, attribute = name.rsplit('.', 1)
+            m = importlib.import_module(module_name)
+            module = importlib.reload(m)
+            return getattr(module, attribute), None
+        except ModuleNotFoundError as e:
+            return None, e
