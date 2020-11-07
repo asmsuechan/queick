@@ -2,6 +2,7 @@ import unittest
 from concurrent.futures import ThreadPoolExecutor
 
 from queick.job import Job
+from queick.exceptions import NoSuchJobError
 
 class TestJob(unittest.TestCase):
     def setUp(self):
@@ -14,8 +15,9 @@ class TestJob(unittest.TestCase):
         Job('tests.testfunc.func', ('test',), None, None, None)
 
     def test_init_error(self):
-        with self.assertRaises(ModuleNotFoundError):
-            Job('tests.notfound.func', ('test',), None, None, None)
+        with self.assertRaises(NoSuchJobError):
+            j = Job('tests.notfound.func', ('test',), None, None, None)
+            j.func
 
     def test_perform(self):
         executor = ThreadPoolExecutor(max_workers=1)
