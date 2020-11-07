@@ -9,10 +9,11 @@ from .exceptions import NoSuchJobError
 
 logger = getLogger(__name__)
 
+
 class Job:
     def __init__(self, func_name, args, executor, scheduler, network_watcher, start_at=time.time(), priority=1,
-                retry=False, retry_interval=10, max_retry_interval=3600, retry_on_network_available=False,
-                retry_type=RETRY_TYPE.EXPONENTIAL):
+                 retry=False, retry_interval=10, max_retry_interval=3600, retry_on_network_available=False,
+                 retry_type=RETRY_TYPE.EXPONENTIAL):
         self.func_name = func_name
         self.args = args
         self.scheduler = scheduler
@@ -33,7 +34,8 @@ class Job:
     def func(self):
         f, err = self._import_job_module(self.func_name)
         if type(err) == ModuleNotFoundError:
-            raise NoSuchJobError('Queick worker could not find the job. Please check your worker\'s launching directory.')
+            raise NoSuchJobError(
+                'Queick worker could not find the job. Please check your worker\'s launching directory.')
         if err:
             raise err
         return self._create_func_with_error_handling(f)
@@ -51,10 +53,11 @@ class Job:
         def f(args):
             try:
                 res = func(*args)
-                self.terminate() # Terminate all idle threads
+                self.terminate()  # Terminate all idle threads
                 return res
             except Exception as e:
-                logger.error("Error during executing a job function: %s", self.func_name, exc_info=True)
+                logger.error("Error during executing a job function: %s",
+                             self.func_name, exc_info=True)
 
                 if not self.retry_on_network_available and self.retry:
                     self._schedule_retry()
@@ -63,7 +66,8 @@ class Job:
                     # The priority of retry_on_network_available is higher than retry.
                     # Normal retry will be ignored when retry_on_network_available == True.
                     if self.network_watcher.state == NW_STATE.INITIATED:
-                        logger.error('func_name: %s, args: %s, retry_on_network_available is specified, but --ping-host is not set to Queick worker.', self.func_name, self.args)
+                        logger.error(
+                            'func_name: %s, args: %s, retry_on_network_available is specified, but --ping-host is not set to Queick worker.', self.func_name, self.args)
                     else:
                         self.network_watcher.enqueue(self.job_input_obj)
 
@@ -74,14 +78,14 @@ class Job:
     @property
     def job_input_obj(self):
         return {
-                "func_name": self.func_name,
-                "args": self.args,
-                "retry": self.retry,
-                "retry_interval": self.retry_interval,
-                "retry_type": self.retry_type,
-                "max_retry_interval": self.max_retry_interval,
-                "retry_on_network_available": self.retry_on_network_available
-                }
+            "func_name": self.func_name,
+            "args": self.args,
+            "retry": self.retry,
+            "retry_interval": self.retry_interval,
+            "retry_type": self.retry_type,
+            "max_retry_interval": self.max_retry_interval,
+            "retry_on_network_available": self.retry_on_network_available
+        }
 
     def _schedule_retry(self):
         self._increase_retry_count()
@@ -102,7 +106,8 @@ class Job:
         elif self.retry_type == RETRY_TYPE.LINEAR_INCREASING:
             interval = self.retry_interval * self.retry_count
         elif self.retry_type == RETRY_TYPE.EXPONENTIAL:
-            sleep_seconds = (2 ** (self.retry_count - 1)) * (0.5 * (1 + random()))
+            sleep_seconds = (2 ** (self.retry_count - 1)) * \
+                (0.5 * (1 + random()))
             sleep_seconds = max([1, sleep_seconds])
             interval = sleep_seconds
 

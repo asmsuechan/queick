@@ -8,6 +8,7 @@ from .job import Job
 
 logger = getLogger(__name__)
 
+
 class NetworkWatcher:
     def __init__(self, hostname, port, queue_class=None):
         self.hostname = hostname
@@ -55,8 +56,10 @@ class NetworkWatcher:
                     while self.is_empty() != True:
                         # Dequeue all from failed queue and perform them
                         data = self.dequeue()
-                        logger.debug('[NetworkWatcher] Job is dequeued: %s', data)
-                        job = Job(data['func_name'], data['args'], None, self, retry=data['retry'], retry_interval=data['retry_interval'], retry_type=data['retry_type'], retry_on_network_available=data['retry_on_network_available'])
+                        logger.debug(
+                            '[NetworkWatcher] Job is dequeued: %s', data)
+                        job = Job(data['func_name'], data['args'], None, self, retry=data['retry'], retry_interval=data['retry_interval'],
+                                  retry_type=data['retry_type'], retry_on_network_available=data['retry_on_network_available'])
                         job.perform()
                 self.state = NW_STATE.CONNECTED
             else:

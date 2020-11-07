@@ -15,6 +15,7 @@ from .logger import setup_logger
 
 logger = getLogger(__name__)
 
+
 class Worker:
     def work(self, ping_host=None, ping_port=80, log_filepath=None, debug=False):
         loglevel = DEBUG if debug else INFO
@@ -42,7 +43,8 @@ class Worker:
 
         except KeyboardInterrupt:
             p.terminate()
-            if nw.state != NW_STATE.INITIATED: nw.terminate()
+            if nw.state != NW_STATE.INITIATED:
+                nw.terminate()
             for job in scheduler.queue.queue:
                 scheduler.queue.cancel(job)
             logger.info("Stopping... Press Ctrl+C to exit immediately")

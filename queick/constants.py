@@ -2,6 +2,7 @@ def enum(name, *sequential, **named):
     values = dict(zip(sequential, range(len(sequential))), **named)
     return type(str(name), (), values)
 
+
 RETRY_TYPE = enum(
     'RetryType',
     CONSTANT='constant',
