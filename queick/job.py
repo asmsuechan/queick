@@ -14,9 +14,20 @@ logger = getLogger(__name__)
 
 
 class Job:
-    def __init__(self, func_name: str, args: tuple, executor: ThreadPoolExecutor, scheduler, network_watcher, start_at: float = time.time(), priority: int = 1,
-                 retry: bool = False, retry_interval: int = 10, max_retry_interval: int = 3600, retry_on_network_available: bool = False,
-                 retry_type=RETRY_TYPE.EXPONENTIAL):
+    def __init__(
+            self,
+            func_name: str,
+            args: tuple,
+            executor: ThreadPoolExecutor,
+            scheduler,
+            network_watcher,
+            start_at: float = time.time(),
+            priority: int = 1,
+            retry: bool = False,
+            retry_interval: int = 10,
+            max_retry_interval: int = 3600,
+            retry_on_network_available: bool = False,
+            retry_type=RETRY_TYPE.EXPONENTIAL):
         self.func_name = func_name
         self.args = args
         self.scheduler = scheduler
@@ -36,7 +47,7 @@ class Job:
     @property
     def func(self) -> MethodType:
         f, err = self._import_job_module(self.func_name)
-        if type(err) == ModuleNotFoundError:
+        if isinstance(err, ModuleNotFoundError):
             raise NoSuchJobError(
                 'Queick worker could not find the job. Please check your worker\'s launching directory.')
         if err:
@@ -67,10 +78,13 @@ class Job:
 
                 if self.retry_on_network_available:
                     # The priority of retry_on_network_available is higher than retry.
-                    # Normal retry will be ignored when retry_on_network_available == True.
+                    # Normal retry will be ignored when
+                    # retry_on_network_available == True.
                     if self.network_watcher.state == NW_STATE.INITIATED:
                         logger.error(
-                            'func_name: %s, args: %s, retry_on_network_available is specified, but --ping-host is not set to Queick worker.', self.func_name, self.args)
+                            'func_name: %s, args: %s, retry_on_network_available is specified, but --ping-host is not set to Queick worker.',
+                            self.func_name,
+                            self.args)
                     else:
                         self.network_watcher.enqueue(self.job_input_obj)
 

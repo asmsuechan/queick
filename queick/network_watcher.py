@@ -35,7 +35,7 @@ class NetworkWatcher:
             s = socket.create_connection((host, self.port), 2)
             s.close()
             return True
-        except:
+        except BaseException:
             pass
         return False
 
@@ -58,8 +58,15 @@ class NetworkWatcher:
                         data = self.dequeue()
                         logger.debug(
                             '[NetworkWatcher] Job is dequeued: %s', data)
-                        job = Job(data['func_name'], data['args'], None, self, retry=data['retry'], retry_interval=data['retry_interval'],
-                                  retry_type=data['retry_type'], retry_on_network_available=data['retry_on_network_available'])
+                        job = Job(
+                            data['func_name'],
+                            data['args'],
+                            None,
+                            self,
+                            retry=data['retry'],
+                            retry_interval=data['retry_interval'],
+                            retry_type=data['retry_type'],
+                            retry_on_network_available=data['retry_on_network_available'])
                         job.perform()
                 self.state = NW_STATE.CONNECTED
             else:

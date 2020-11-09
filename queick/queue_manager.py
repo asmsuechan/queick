@@ -37,8 +37,16 @@ class QueueManager:
 
                 max_workers = os.cpu_count()
                 executor = ThreadPoolExecutor(max_workers=max_workers)
-                job = self.create_job(data['func_name'], data['args'], executor, scheduler, nw, retry=data['retry'], retry_interval=data['retry_interval'],
-                                      retry_type=data['retry_type'], retry_on_network_available=data['retry_on_network_available'])
+                job = self.create_job(
+                    data['func_name'],
+                    data['args'],
+                    executor,
+                    scheduler,
+                    nw,
+                    retry=data['retry'],
+                    retry_interval=data['retry_interval'],
+                    retry_type=data['retry_type'],
+                    retry_on_network_available=data['retry_on_network_available'])
                 if 'start_at' in data:
                     job.start_at = data['start_at']
                     scheduler.put(job)
