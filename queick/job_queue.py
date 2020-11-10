@@ -3,6 +3,7 @@ import pickle
 
 from .constants import RETRY_TYPE, TCP_SERVER_HOST, TCP_SERVER_PORT
 from .exceptions import WorkerNotFoundError
+from .scheduling_time import SchedulingTime
 
 from types import MethodType
 from typing import Union, Tuple
@@ -55,6 +56,31 @@ class JobQueue:
             max_workers,
             start_at=start_at)
 
+    def cron(self, st: SchedulingTime,
+             func: MethodType,
+             args: Union[tuple,
+                         None] = None,
+             priority: int = 1,
+             retry: bool = False,
+             retry_interval: int = 10,
+             max_retry_interval: int = 600,
+             retry_on_network_available: bool = False,
+             retry_type: RETRY_TYPE = RETRY_TYPE.EXPONENTIAL,
+             max_workers: int = 10) -> dict:
+        st.validate()
+        return self._create_request(
+            func,
+            args,
+            priority,
+            retry,
+            retry_interval,
+            max_retry_interval,
+            retry_on_network_available,
+            retry_type,
+            max_workers,
+            start_at=st.start_at,
+            interval=st.interval)
+
     def _create_request(self,
                         func: MethodType,
                         args,
@@ -66,7 +92,8 @@ class JobQueue:
                         retry_type: RETRY_TYPE,
                         max_workers: int,
                         start_at: Union[float,
-                                        None] = None):
+                                        None] = None,
+                        interval: Union[float, None] = None):
         func_name = func.__module__ + "." + func.__name__
         payload = {
             "func_name": func_name,
@@ -80,6 +107,8 @@ class JobQueue:
         }
         if start_at:
             payload.update({"start_at": start_at})
+        if interval:
+            payload.update({"interval": interval})
         result, error = self._send_to_job_listener(payload)
         if error:
             raise error

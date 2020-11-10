@@ -42,6 +42,9 @@ class Job:
         self.executor = executor
         self._minimum_retry_interval = 1
 
+        self.cron = False
+        self.cron_interval = 0
+
         self.network_watcher = network_watcher
 
     @property
@@ -66,6 +69,9 @@ class Job:
     def _create_func_with_error_handling(self, func: MethodType):
         def f(args):
             try:
+                print(self.cron)
+                if self.cron:
+                    self._register_cron()
                 res = func(*args)
                 self.terminate()  # Terminate all idle threads
                 return res
@@ -109,6 +115,10 @@ class Job:
         self.start_at = self.start_at + self._calc_retry_interval()
         self.scheduler.put(self)
         self.scheduler.run()
+
+    def _register_cron(self) -> None:
+        self.start_at += self.cron_interval
+        self.scheduler.put(self)
 
     def _increase_retry_count(self) -> None:
         self.retry_count += 1

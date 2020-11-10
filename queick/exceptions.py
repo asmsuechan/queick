@@ -4,3 +4,11 @@ class WorkerNotFoundError(Exception):
 
 class NoSuchJobError(Exception):
     pass
+
+
+class IntervalMustAboveZeroError(Exception):
+    pass
+
+
+class MustSetStartAtError(Exception):
+    pass
