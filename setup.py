@@ -2,7 +2,7 @@ from setuptools import setup, find_packages
 
 setup(
     name="queick",
-    version="1.1.1",
+    version="1.2.0",
     url="https://github.com/asmsuechan/queick",
     description="A lightweight job-queue management system",
     author="asmsuechan",
