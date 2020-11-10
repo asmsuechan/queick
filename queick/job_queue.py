@@ -33,7 +33,7 @@ class JobQueue:
             max_workers)
 
     def enqueue_at(self,
-                   start_at: float,
+                   start_at: Union[float, SchedulingTime],
                    func: MethodType,
                    args: Union[tuple,
                                None] = None,
@@ -44,6 +44,12 @@ class JobQueue:
                    retry_on_network_available: bool = False,
                    retry_type: RETRY_TYPE = RETRY_TYPE.EXPONENTIAL,
                    max_workers: int = 10) -> dict:
+
+        if type(start_at) == SchedulingTime:
+            _sa = start_at.start_at
+        else:
+            _sa = start_at
+
         return self._create_request(
             func,
             args,
@@ -54,7 +60,7 @@ class JobQueue:
             retry_on_network_available,
             retry_type,
             max_workers,
-            start_at=start_at)
+            start_at=_sa)
 
     def cron(self, st: SchedulingTime,
              func: MethodType,
