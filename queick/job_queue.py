@@ -45,7 +45,7 @@ class JobQueue:
                    retry_type: RETRY_TYPE = RETRY_TYPE.EXPONENTIAL,
                    max_workers: int = 10) -> dict:
 
-        if type(start_at) == SchedulingTime:
+        if isinstance(start_at, SchedulingTime):
             _sa = start_at.start_at
         else:
             _sa = start_at
