@@ -54,6 +54,8 @@ Third, run the application.
 $ python test.py
 ```
 
+For more detailed information, [please refer the documentation](/docs).
+
 ## Retry on network available
 Jobs inside the **failed queue** will be dequeued when the network status changes from disconnected to connected.
 
