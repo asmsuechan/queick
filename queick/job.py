@@ -138,7 +138,7 @@ class Job:
             sleep_seconds = max([1, sleep_seconds])
             interval = sleep_seconds
 
-        if interval > self.max_retry_interval:
+        if self.max_retry_interval >= 0 and interval > self.max_retry_interval:
             interval = self.max_retry_interval
 
         return interval

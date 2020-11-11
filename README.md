@@ -42,6 +42,10 @@ from time import time
 q = JobQueue()
 q.enqueue(function, args=("hello",))
 q.enqueue_at(time() + 5, function, args=("world",)) # Run after 5 seconds
+
+st = SchedulingTime()
+st.every(minutes=1).starting_from(time.time() + 10)
+q.cron(st, function, args=(1, 2,)) # Run after 10 seconds and every 1 minute
 ```
 
 Third, run the application.

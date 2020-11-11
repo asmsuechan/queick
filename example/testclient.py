@@ -1,5 +1,5 @@
 from queick import JobQueue, RETRY_TYPE, SchedulingTime
-from jobfunc import function, function2
+from jobfunc import function
 import time
 import pdb
 
