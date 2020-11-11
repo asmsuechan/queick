@@ -1,10 +1,10 @@
-from queick import JobQueue, RETRY_TYPE
+from queick import JobQueue, RETRY_TYPE, SchedulingTime
 from jobfunc import function
 import time
 
 q = JobQueue()
 q.enqueue(function, args=(1, 2,))
-q.enqueue_at(time.time() + 5, function2, args=(2, 3,))
+q.enqueue_at(time.time() + 5, function, args=(2, 3,))
 
 st = SchedulingTime()
 st.every(minutes=1).starting_from(time.time() + 10)

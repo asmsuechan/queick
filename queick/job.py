@@ -69,7 +69,6 @@ class Job:
     def _create_func_with_error_handling(self, func: MethodType):
         def f(args):
             try:
-                print(self.cron)
                 if self.cron:
                     self._register_cron()
                 res = func(*args)
