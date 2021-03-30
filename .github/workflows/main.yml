@@ -26,5 +26,5 @@ jobs:
       run: python -m unittest
     - name: Integration test with docker
       run: |
-        docker build -t queick-test .
+        docker build -f Dockerfile.test -t queick-test .
         docker run --rm queick-test:latest

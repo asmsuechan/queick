@@ -8,7 +8,7 @@ A simple inmemory job-queue manager for Python.
 * Job-queue manager **without redis**
 * Working for low-spec machines
 * Retry
-* **Retry on network available**
+* **Retry when network available**
 * Scheduling
 
 ## Installation
